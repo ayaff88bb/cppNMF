@@ -1,5 +1,7 @@
 # cppNMF
 
+[![C++ CI](https://github.com/ayaff88bb/cppNMF/actions/workflows/ci.yml/badge.svg)](https://github.com/ayaff88bb/cppNMF/actions/workflows/ci.yml)
+
 一个面向旋转机械冲击特征提取的 C++17 信号处理项目。项目将原 MATLAB
 Deep nsNMF 研究程序重构为可复用静态库、命令行工具和自动化测试，并保留
 MATLAB 数值基准用于跨语言回归验证。
@@ -19,7 +21,8 @@ CSV 信号 → 清洗/去均值 → STFT → q_NSD → MO 压缩
 - 可选的多谐波周期完整性奖励，与 MATLAB 的 `lambda_rep` 路径一致
 - 频域软掩膜分离顶层子空间，并还原各分量时域信号
 - CLI 文件输入、运行预设、参数覆盖、CSV/JSON 结果导出和分阶段计时
-- GoogleTest 单元测试，以及基于真实信号的 MATLAB golden tests
+- GoogleTest 单元测试，以及基于确定性合成冲击信号的 MATLAB golden tests
+- GitHub Actions 在 Windows 和 Ubuntu 上执行跨平台配置、构建与测试
 
 ## 构建
 
