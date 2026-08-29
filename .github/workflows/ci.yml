@@ -27,3 +27,13 @@ jobs:
 
       - name: Test
         run: ctest --test-dir build-ci --build-config Release --output-on-failure
+
+      - name: Package
+        run: cpack --config build-ci/CPackConfig.cmake -C Release
+
+      - name: Upload package
+        uses: actions/upload-artifact@v4
+        with:
+          name: cppNMF-${{ matrix.os }}
+          path: build-ci/packages/*
+          if-no-files-found: error

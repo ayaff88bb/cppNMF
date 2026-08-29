@@ -1,8 +1,9 @@
-cmake_minimum_required(VERSION 3.24)
+cmake_minimum_required(VERSION 3.25)
 
 project(cppNMF VERSION 0.1.0 LANGUAGES C CXX)
 
 include(FetchContent)
+include(GNUInstallDirs)
 
 option(CPPNMF_BUILD_TESTS "Build cppNMF tests" ON)
 option(CPPNMF_BUILD_CLI "Build the cppNMF command line application" ON)
@@ -110,4 +111,55 @@ if(CPPNMF_BUILD_TESTS)
   target_compile_definitions(cppnmf_tests PRIVATE
     CPPNMF_TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/validation/public_golden")
   gtest_discover_tests(cppnmf_tests)
+endif()
+
+if(CPPNMF_BUILD_CLI)
+  install(TARGETS cppnmf_cli
+    RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+    COMPONENT Runtime)
+
+  if(MSVC)
+    set(CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION "${CMAKE_INSTALL_BINDIR}")
+    set(CMAKE_INSTALL_SYSTEM_RUNTIME_COMPONENT Runtime)
+    include(InstallRequiredSystemLibraries)
+  endif()
+
+  install(FILES README.md LICENSE
+    DESTINATION "."
+    COMPONENT Runtime)
+
+  if(WIN32 AND CMAKE_SIZEOF_VOID_P EQUAL 8)
+    set(CPPNMF_PACKAGE_PLATFORM "windows-x64")
+  elseif(WIN32)
+    set(CPPNMF_PACKAGE_PLATFORM "windows-x86")
+  elseif(APPLE)
+    set(CPPNMF_PACKAGE_PLATFORM "macos-${CMAKE_SYSTEM_PROCESSOR}")
+  else()
+    string(TOLOWER "${CMAKE_SYSTEM_NAME}" CPPNMF_SYSTEM_NAME_LOWER)
+    set(CPPNMF_PACKAGE_PLATFORM
+      "${CPPNMF_SYSTEM_NAME_LOWER}-${CMAKE_SYSTEM_PROCESSOR}")
+  endif()
+
+  set(CPACK_PACKAGE_NAME "cppNMF")
+  set(CPACK_PACKAGE_VENDOR "ayaff88bb")
+  set(CPACK_PACKAGE_DESCRIPTION_SUMMARY
+    "C++17 impact feature extraction with STFT and Deep NMF")
+  set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
+  set(CPACK_PACKAGE_FILE_NAME
+    "cppNMF-${PROJECT_VERSION}-${CPPNMF_PACKAGE_PLATFORM}")
+  set(CPACK_PACKAGE_DIRECTORY "${CMAKE_BINARY_DIR}/packages")
+  set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
+  set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY ON)
+  set(CPACK_PACKAGE_CHECKSUM SHA256)
+  set(CPACK_COMPONENTS_ALL Runtime)
+  set(CPACK_INSTALL_CMAKE_PROJECTS
+    "${CMAKE_BINARY_DIR};${PROJECT_NAME};Runtime;/")
+
+  if(WIN32)
+    set(CPACK_GENERATOR "ZIP")
+  else()
+    set(CPACK_GENERATOR "TGZ")
+  endif()
+
+  include(CPack)
 endif()

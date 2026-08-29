@@ -1,0 +1,67 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  build-package:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure
+        run: >-
+          cmake -S . -B build-release
+          -DCMAKE_BUILD_TYPE=Release
+          -DCPPNMF_BUILD_TESTS=ON
+          -DCPPNMF_BUILD_CLI=ON
+          -DCPPNMF_BUILD_BENCHMARKS=OFF
+
+      - name: Build
+        run: cmake --build build-release --config Release --parallel 2
+
+      - name: Test
+        run: ctest --test-dir build-release --build-config Release --output-on-failure
+
+      - name: Package
+        run: cpack --config build-release/CPackConfig.cmake -C Release
+
+      - name: Upload package
+        uses: actions/upload-artifact@v4
+        with:
+          name: cppNMF-${{ matrix.os }}
+          path: build-release/packages/*
+          if-no-files-found: error
+
+  create-release:
+    needs: build-package
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download packages
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+          merge-multiple: true
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh release create "${GITHUB_REF_NAME}"
+          release-assets/*
+          --verify-tag
+          --generate-notes
+          --title "cppNMF ${GITHUB_REF_NAME}"
