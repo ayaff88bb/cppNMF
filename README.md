@@ -43,6 +43,31 @@ ctest --preset windows-msvc-release
 - `build/windows-msvc/cppnmf_tests.exe`
 - `build/windows-msvc/cppnmf_core.lib`
 
+## 发布包
+
+完成 Release 构建和测试后，可生成包含 CLI、许可证、README 以及 Windows
+MSVC 运行库的 ZIP 交付包：
+
+```powershell
+cpack --preset windows-msvc-release
+```
+
+输出位于：
+
+```text
+build/windows-msvc/packages/cppNMF-0.1.0-windows-x64.zip
+```
+
+解压后可以直接运行内置演示：
+
+```powershell
+bin/cppnmf_cli.exe --demo --output outputs/demo
+```
+
+GitHub Actions 会在 Windows 和 Ubuntu 上构建、测试并保存对应平台的交付包；
+推送 `v*` 标签时，Release 工作流会自动创建 GitHub Release 并上传这些文件。
+维护者发布步骤见 `docs/RELEASE.md`。
+
 ## 运行
 
 快速演示：
