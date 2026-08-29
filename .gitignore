@@ -1,0 +1,19 @@
+/build/
+/out/
+/outputs/
+/MathWorks/
+/.deps/
+/.download/
+/.vs/
+/.vscode/
+*.user
+*.suo
+*.VC.db
+*.VC.opendb
+__pycache__/
+*.pyc
+
+# Private research inputs and generated validation artifacts
+*.mat
+/validation/cpp_golden/
+/validation/baseline_comparison.csv

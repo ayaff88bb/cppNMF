@@ -1,0 +1,29 @@
+name: C++ CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-and-test:
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure
+        run: >-
+          cmake -S . -B build-ci
+          -DCMAKE_BUILD_TYPE=Release
+          -DCPPNMF_BUILD_TESTS=ON
+          -DCPPNMF_BUILD_CLI=ON
+          -DCPPNMF_BUILD_BENCHMARKS=OFF
+
+      - name: Build
+        run: cmake --build build-ci --config Release --parallel 2
+
+      - name: Test
+        run: ctest --test-dir build-ci --build-config Release --output-on-failure

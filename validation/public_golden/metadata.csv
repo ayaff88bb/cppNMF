@@ -1,0 +1,2 @@
+sample_rate_hz,sample_count,fft_length,window_length,hop_length,bin_count,frame_count,padding_length
+20000,20000,1024,120,20,512,995,0
